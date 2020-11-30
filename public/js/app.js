@@ -5264,7 +5264,6 @@ var cartCounter = document.querySelector('#cartCounter'); //for each button
 
 function updateCart(pizza) {
   axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/update-cart', pizza).then(function (res) {
-    console.log(res);
     cartCounter.innerText = res.data.totalQty;
     new noty__WEBPACK_IMPORTED_MODULE_1___default.a({
       type: 'success',
@@ -5272,7 +5271,11 @@ function updateCart(pizza) {
       text: 'Item added to cart'
     }).show();
   })["catch"](function (err) {
-    console.log(err);
+    new noty__WEBPACK_IMPORTED_MODULE_1___default.a({
+      type: 'error',
+      timeout: 1000,
+      text: 'Something went wrong'
+    }).show();
   });
 }
 
