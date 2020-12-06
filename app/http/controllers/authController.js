@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt')
 const passport = require('passport')
 
 function authController(){
+    const _getRedirectUrl = () => {
+        return req.user.role==='admin'?'admin/orders' : 'customers/orders' }
 
     return {
         logout(req,res){
@@ -26,7 +28,7 @@ function authController(){
                     if(err){
                     req.flash('error',info.message)
                     }
-                    return res.redirect('/')
+                    return res.redirect(_getRedirectUrl(req))
                 })
             })(req, res, next)
         },
