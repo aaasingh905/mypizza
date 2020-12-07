@@ -49,9 +49,11 @@ function orderController () {
                             
                         })
                     }
-               
-                    
-                //return res.redirect('/customers/orders')
+                    else {
+                        delete req.session.cart
+                        return res.json({message:'Order Successfully Placed'})
+                    }
+
                 })
                 
             })
