@@ -1,6 +1,7 @@
  import axios from 'axios'
  import Noty from 'noty';
  import { initAdmin } from './admin'
+ import { initStripe } from './stripe'
  import moment from 'moment'
 
  //getting array of all add to cart buttons on page
@@ -75,6 +76,7 @@ function updateStatus(order) {
 
 updateStatus(order);
 
+initStripe();
 //socket
 //after adding script in app.js
 //io method will be available here

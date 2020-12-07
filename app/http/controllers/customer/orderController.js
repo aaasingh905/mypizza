@@ -1,13 +1,13 @@
 const Order = require('../../../models/order')
 const moment = require('moment')
+const stripe = require('stripe')(process.env.SECRET_KEY)
 function orderController () {
     return {
         store (req, res) {
             // Validate Request 
-            const { phone, address } = req.body
+            const { phone, address, stripeToken, paymentType } = req.body
             if(!phone || !address) {
-                req.flash('error', 'All fields required')
-                return res.redirect('/cart')
+                return res.status(422).json({message:"All fields are required"})
 
             }
 
@@ -21,18 +21,42 @@ function orderController () {
             order.save()
             .then(result => {
                 Order.populate(result,{path:'customerId'},(err, placedOrder)=>{
-                    req.flash('success','Order placed successfully')
-                delete req.session.cart
-                // Emit 
-                const eventEmitter = req.app.get('eventEmitter')
-                eventEmitter.emit('orderPlaced',placedOrder) //emitted id and status on change of status
-                return res.redirect('/customers/orders')
+                    //req.flash('success','Order placed successfully')
+               
+                    //Strip Payment
+                    if(paymentType === 'card'){
+                        stripe.charges.create ({
+                            amount: req.session.cart.totalPrice * 100,
+                            source:stripeToken,
+                            currency: 'inr',
+                            description: `Pizza order: ${placedOrder._id}`
+                        }).then(result => {
+                            placedOrder.paymentStatus = true;
+                            placedOrder.paymentType = paymentType;
+                            placedOrder.save().then(result=>{
+                                console.log(result);
+                                // Emit 
+                                 const eventEmitter = req.app.get('eventEmitter')
+                                 eventEmitter.emit('orderPlaced',result) //emitted id and status on change of status
+                                 delete req.session.cart   
+                                 return res.json({message:'Payment successful, Order Successfully Placed'})
+                            }).catch(err => {
+                                console.log(err)
+                            })
+                        }).catch(err => {
+                                  delete req.session.cart
+                                 return res.json({message:'Payment failed, You can pay at delivery'})
+                            
+                        })
+                    }
+               
+                    
+                //return res.redirect('/customers/orders')
                 })
                 
             })
             .catch(error => {
-                req.flash('error','Something went wrong')
-                return res.redirect('/cart')
+                return res.status(500).json({message:'Something went wrong'})
             })
         },
         async index(req, res){

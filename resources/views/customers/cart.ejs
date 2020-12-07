@@ -26,11 +26,18 @@
             </div>
             <% if(user) { %>
             <div>
-                <form class="mt-12" action="/orders" method="POST">
+                <form id="payment-form"class="mt-12" action="/orders" method="POST">
+                    
+                    <select id="paymentType" name="paymentType" class="border border-grey-400 p-2 w-1/2 mb-4">
+                        <option value="cod">Cash on delivery</option>
+                        <option value="card">Pay with card</option>
+                      </select>
                     <input name="phone"class="border border-grey-400 p-2 w-1/2 mb-4" 
                     type="text" placeholder="Phone Number">
                     <input name="address"class="border border-grey-400 p-2 w-1/2" 
                     type="text" placeholder="Address">
+                    <div class="mt-4">
+                        <div id="card-element"></div>
                     <button class= "btn-primary px-6 w-1/2 py-2 rounded-full text-white font-bold mt-4" type="submit">Order Now</button>
                 </form>
             </div>
